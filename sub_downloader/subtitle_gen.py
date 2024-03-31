@@ -98,13 +98,13 @@ class SubtitleGenerator:
 
         translated_items = srt_items
         if keep_orginal:
-            with open(dest_file + "_org", "w") as f:
+            with open(dest_file + "_org.srt", "w") as f:
                 for item in srt_items[1]:
                     f.write(str(item) + "\n")
             f.close()
             translated_items = srt_items[0]
 
-        with open(dest_file + "_trns", "w") as f:
+        with open(dest_file + "_trns.srt", "w") as f:
             for item in translated_items:
                 f.write(str(item) + "\n")
         f.close()
