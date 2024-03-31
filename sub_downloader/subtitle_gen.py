@@ -41,7 +41,7 @@ class SubtitleGenerator:
 
 
 
-    def get_subtitle(self):
+    def get_subtitle(self, keep_orginal):
         transcript, ok = self.__does_sub_exist()
         if not ok:
             # TODO: use OpenAI voice recognizer if there is no sub
@@ -49,36 +49,67 @@ class SubtitleGenerator:
 
         transcript_content = transcript.fetch()
 
-        srt_obj_list = []
+        srt_obj_list_org = []
+        srt_obj_list_trns = []
         lang = transcript.language_code
         index = 1
         for obj in transcript_content:
             start = convert_sec_to_srt(obj["start"])
             end = convert_sec_to_srt(obj["start"] + obj["duration"])
-            if lang == 'fa':
-                text = obj["text"]
-            else:
-                text = self.translate_text(obj["text"])
-
-            s = SrtItem(index=index, start=start, end=end, text=text) 
-            srt_obj_list.append(s)
-            index += 1
         
+            text_original = obj["text"]
 
-        return srt_obj_list
+            if lang!= self.dst_lang:
+                text_translated = self.translate_text(obj["text"])
+
+            if keep_orginal:
+                srt_obj_list_org.append(
+                    SrtItem(
+                        index=index,
+                        start=start,
+                        end=end,
+                        text=text_original
+                    )
+                ) 
+
+            srt_obj_list_trns.append(
+                SrtItem(
+                    index=index,
+                    start=start,
+                    end=end,
+                    text=text_translated
+                )
+            )
+            index += 1
+
+        if keep_orginal: 
+            return srt_obj_list_trns, srt_obj_list_org
+        else:
+            return srt_obj_list_trns
     
 
-    def save_subtitle(self, filename=None):
+    def save_subtitle(self, filename=None, keep_orginal=False):
         if not filename and not self.srt_filename:
             raise ValueError("Output file has no name")
 
         dest_file = self.srt_filename if self.srt_filename is not None else filename
-        srt_items = self.get_subtitle()
 
-        with open(dest_file, "w") as f:
-            for item in srt_items:
+        srt_items = self.get_subtitle(keep_orginal)
+
+        translated_items = srt_items
+        if keep_orginal:
+            with open(dest_file + "_org", "w") as f:
+                for item in srt_items[1]:
+                    f.write(str(item) + "\n")
+            f.close()
+            translated_items = srt_items[0]
+
+        with open(dest_file + "_trns", "w") as f:
+            for item in translated_items:
                 f.write(str(item) + "\n")
         f.close()
+
+
 
     def translate_text(self, text):
         return self.translator.translate(text, src=self.src_lang, dest=self.dst_lang).text
@@ -92,8 +123,3 @@ def convert_sec_to_srt(seconds):
     
     return f"{hours:02d}:{minutes:02d}:{seconds:02d},{milliseconds:03d}"
 
-
-TEST_ID = "PaxVCsnox_4&t=5s"
-translator = Translator()
-sg = SubtitleGenerator(video_id=TEST_ID, srt_filname="out.srt", translator=translator)
-sg.save_subtitle()

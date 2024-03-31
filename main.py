@@ -1,9 +1,3 @@
-
-
-
-
-
-
 def main():
     """
     list of wnated args
