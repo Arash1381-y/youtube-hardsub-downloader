@@ -122,4 +122,3 @@ def convert_sec_to_srt(seconds):
     milliseconds = int((seconds % 1) * 1000)
     
     return f"{hours:02d}:{minutes:02d}:{seconds:02d},{milliseconds:03d}"
-

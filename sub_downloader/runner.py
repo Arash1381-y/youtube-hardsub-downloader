@@ -20,6 +20,6 @@ def run():
     dest_lang = args[2]
     translator = Translator()
     sg = SubtitleGenerator(video_id=video_id, src_lang=source_lang, dst_lang=dest_lang, translator=translator)
-    sg.save_subtitle(filename=path +  "/" + "sub", keep_orginal=True)
+    sg.save_subtitle(filename=path +  "/subs/" + "sub", keep_orginal=True)
  
 run()
