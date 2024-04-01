@@ -8,7 +8,7 @@ class HardcodeSubGen:
 
 
     def hardcode_sub(self):
+        print("reach here")
         video = ffmpeg.input(self.input_video)
         audio = video.audio
         ffmpeg.concat(video.filter("subtitles", self.input_sub), audio, v=1, a=1).output(self.output_video).run()
-        ffmpeg.input(self.input_video)
