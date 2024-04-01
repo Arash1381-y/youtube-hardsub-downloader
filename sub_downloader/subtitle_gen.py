@@ -88,7 +88,7 @@ class SubtitleGenerator:
             return srt_obj_list_trns
     
 
-    def save_subtitle(self, filename=None, keep_orginal=False):
+    def save_subtitle(self, path, filename=None, keep_orginal=False, suffix="_org"):
         if not filename and not self.srt_filename:
             raise ValueError("Output file has no name")
 
@@ -98,13 +98,13 @@ class SubtitleGenerator:
 
         translated_items = srt_items
         if keep_orginal:
-            with open(dest_file + "_org.srt", "w") as f:
+            with open(path + dest_file + suffix + ".srt", "w") as f:
                 for item in srt_items[1]:
                     f.write(str(item) + "\n")
             f.close()
             translated_items = srt_items[0]
 
-        with open(dest_file + "_trns.srt", "w") as f:
+        with open(path + dest_file + ".srt", "w") as f:
             for item in translated_items:
                 f.write(str(item) + "\n")
         f.close()
